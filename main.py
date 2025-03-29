@@ -1,7 +1,8 @@
 import copy
+import random
 
 initboard = [["x", "_", "o"],
-         ["x", "o", ""],
+         ["x", "_", "_"],
          ["_", "_", "_"]]
 player = "x"
 bot = "o"
@@ -32,15 +33,18 @@ def win(board, player, bot):
     # if they are close we will block them as long as we arent close
     # if neither are close we will go for any random possible winning spot
 def minimax(board, player, bot, turn):
+    
     new_board = copy.deepcopy(board)
     if win(board, player, bot) == player:
-        return -10, None
+        return -10 + turn, None
     elif win(board, player, bot) == bot:
-        return 10, None
+        return 15 - turn, None
+    elif win(board, player, bot) == "tie":
+        return 5, None
     
-    
-    best_points = float("inf") if turn % 2 == 1 else float("-inf")
+    best_points = float('-inf') if turn % 2 == 1 else float('inf')
     best_move = None
+    possible_moves = []
     for x in range(3):
         for y in range(3):
             if new_board[x][y] == "_":
@@ -48,19 +52,26 @@ def minimax(board, player, bot, turn):
                     new_board[x][y] = bot
                 else:
                     new_board[x][y] = player
+                possible_moves.append((x, y))
                 prettyBoard(new_board)
-                score, _ = minimax(new_board, player, bot, turn+1)
+                score, _ = minimax(new_board, player, bot, turn + 1)
                 new_board[x][y] = "_"
                 print(f"Evaluating move ({x}, {y}) for {'bot' if turn % 2 == 1 else 'player'}: score = {score}")
+                
                 if turn % 2 == 1:
-                    if score >= best_points:
+                    if score > best_points:
                         best_points = score
                         best_move = (x, y)
                 else:
-                    if score <= best_points:
+                    if score < best_points:
                         best_points = score
                         best_move = (x, y)
+
                 print(best_points)
+        if turn <= 2:
+            best_points = 0
+            best_move = random.choice(possible_moves)
+            return best_points, best_move
     print(f"Best move for {'bot' if turn % 2 == 1 else 'player'}: {best_move} with score = {best_points}")
     return best_points, best_move
 print(minimax(initboard, player, bot, 3))
