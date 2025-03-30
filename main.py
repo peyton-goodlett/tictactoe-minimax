@@ -57,10 +57,10 @@ def minimax(board, player, bot, turn):
                 # prettyBoard(new_board)
                 score, _ = minimax(new_board, player, bot, turn + 1)
                 new_board[x][y] = "_"
-                # print(f"Evaluating move ({x}, {y}) for {'bot' if turn % 2 == 1 else 'player'}: score = {score}")
+                print(f"Evaluating move ({x}, {y}) for {'bot' if turn % 2 == 1 else 'player'}: score = {score}")
                 
                 if turn % 2 == 1:
-                    if score > best_points:
+                    if score >= best_points:
                         best_points = score
                         best_move = (x, y)
                 else:
@@ -69,12 +69,12 @@ def minimax(board, player, bot, turn):
                         best_move = (x, y)
 
                 # print(best_points)
-        if turn < 2:
+        if turn <= 2:
             best_points = 0
-            print(possible_moves)
+            
             best_move = random.choice(possible_moves)
             return best_points, best_move
-    print(f"Best move for {'bot' if turn % 2 == 1 else 'player'}: {best_move} with score = {best_points}")
+    # print(f"Best move for {'bot' if turn % 2 == 1 else 'player'}: {best_move} with score = {best_points}")
     return best_points, best_move
 
 def get_move(board, player):
@@ -101,18 +101,6 @@ def tictactoe(board, player, bot):
     while turn < 9 and winner == False:
         print("Current Board:")
         prettyBoard(board)
-        if turn % 2 == 0:
-            row, col = get_move(board, player)
-            board[row][col] = player
-            turn += 1
-            print("New Board:")
-            prettyBoard(board)
-        elif turn % 2 == 1:
-            score, rowcol = minimax(board, player, bot, turn)
-            board[rowcol[0]][rowcol[1]] = bot
-            print(f"Bot chose place {rowcol[0]}, {rowcol[1]} with score of {score}.")
-            print("New Board:")
-            prettyBoard(board)
         if win(board, player, bot) != False:
             print("Game over!")
             if win(board, player, bot) == "tie":
@@ -124,6 +112,19 @@ def tictactoe(board, player, bot):
             elif win(board, player, bot) == bot:
                 print("Game ended with bot win with board:")
                 prettyBoard(board)
+            break
+        if turn % 2 == 0:
+            row, col = get_move(board, player)
+            board[row][col] = player
+            turn += 1
+            print("New Board:")
+            prettyBoard(board)
+        elif turn % 2 == 1:
+            score, rowcol = minimax(board, player, bot, turn)
+            board[rowcol[0]][rowcol[1]] = bot
+            turn += 1
+            print(f"Bot chose place {rowcol[0]}, {rowcol[1]} with score of {score}.")
+
 
 # print(minimax(initboard, player, bot, 1))
 
