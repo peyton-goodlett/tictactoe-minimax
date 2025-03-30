@@ -1,8 +1,8 @@
 import copy
 import random
 
-initboard = [["x", "_", "o"],
-         ["x", "_", "_"],
+initboard = [["_", "_", "_"],
+         ["_", "_", "_"],
          ["_", "_", "_"]]
 player = "x"
 bot = "o"
@@ -27,7 +27,7 @@ def win(board, player, bot):
     if all(cell != "_" for row in board for cell in row):
         return "tie"
     
-    return None
+    return False
     # look at all 8 possible winning spots and see if its close to filling any 8
     # if we are close to filling one (one spot away) then we will place there to win
     # if they are close we will block them as long as we arent close
@@ -52,11 +52,12 @@ def minimax(board, player, bot, turn):
                     new_board[x][y] = bot
                 else:
                     new_board[x][y] = player
+                print((x,y))
                 possible_moves.append((x, y))
-                prettyBoard(new_board)
+                # prettyBoard(new_board)
                 score, _ = minimax(new_board, player, bot, turn + 1)
                 new_board[x][y] = "_"
-                print(f"Evaluating move ({x}, {y}) for {'bot' if turn % 2 == 1 else 'player'}: score = {score}")
+                # print(f"Evaluating move ({x}, {y}) for {'bot' if turn % 2 == 1 else 'player'}: score = {score}")
                 
                 if turn % 2 == 1:
                     if score > best_points:
@@ -67,11 +68,63 @@ def minimax(board, player, bot, turn):
                         best_points = score
                         best_move = (x, y)
 
-                print(best_points)
-        if turn <= 2:
+                # print(best_points)
+        if turn < 2:
             best_points = 0
+            print(possible_moves)
             best_move = random.choice(possible_moves)
             return best_points, best_move
     print(f"Best move for {'bot' if turn % 2 == 1 else 'player'}: {best_move} with score = {best_points}")
     return best_points, best_move
-print(minimax(initboard, player, bot, 3))
+
+def get_move(board, player):
+    while True:
+        print(f"{player}'s turn:")
+        try:
+            row = int(input("Choose a row (1-upper, 2-middle, 3-lower): ")) - 1
+            col = int(input("Choose a column (1-first, 2-second, 3-third): ")) - 1
+        except ValueError:
+            print("Invalid input. Please enter a number between 1 and 3.")
+            continue
+
+        if 0 <= row <= 2 and 0 <= col <= 2:
+            if board[row][col] == "_":
+                return row, col
+            else:
+                print("Spot already taken. Please enter a new spot.")
+        else:
+            print("Invalid row or column. Please choose numbers between 1 and 3.")
+
+def tictactoe(board, player, bot):
+    turn = 0
+    winner = False
+    while turn < 9 and winner == False:
+        print("Current Board:")
+        prettyBoard(board)
+        if turn % 2 == 0:
+            row, col = get_move(board, player)
+            board[row][col] = player
+            turn += 1
+            print("New Board:")
+            prettyBoard(board)
+        elif turn % 2 == 1:
+            score, rowcol = minimax(board, player, bot, turn)
+            board[rowcol[0]][rowcol[1]] = bot
+            print(f"Bot chose place {rowcol[0]}, {rowcol[1]} with score of {score}.")
+            print("New Board:")
+            prettyBoard(board)
+        if win(board, player, bot) != False:
+            print("Game over!")
+            if win(board, player, bot) == "tie":
+                print("Game ended with a tie with board:")
+                prettyBoard(board)
+            elif win(board, player, bot) == player:
+                print("Game ended with player win with board:")
+                prettyBoard(board)
+            elif win(board, player, bot) == bot:
+                print("Game ended with bot win with board:")
+                prettyBoard(board)
+
+# print(minimax(initboard, player, bot, 1))
+
+tictactoe(initboard, player, bot)
