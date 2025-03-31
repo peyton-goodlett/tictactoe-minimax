@@ -32,7 +32,8 @@ def win(board, player, bot):
     # if we are close to filling one (one spot away) then we will place there to win
     # if they are close we will block them as long as we arent close
     # if neither are close we will go for any random possible winning spot
-def minimax(board, player, bot, turn):
+possible_moves = []
+def minimax(board, player, bot, turn, possible_moves):
     
     new_board = copy.deepcopy(board)
     if win(board, player, bot) == player:
@@ -40,11 +41,14 @@ def minimax(board, player, bot, turn):
     elif win(board, player, bot) == bot:
         return 15 - turn, None
     elif win(board, player, bot) == "tie":
-        return 5, None
-    
+        return 10 + round(turn/2), None
     best_points = float('-inf') if turn % 2 == 1 else float('inf')
     best_move = None
-    possible_moves = []
+    # the bot always chooses the same for each spot the player does
+    # because possible moves gets reset, leaving only 1 option
+    # fix it sometime ok future peyton? it make bot worse
+
+    # thx past peyton its fixed
     for x in range(3):
         for y in range(3):
             if new_board[x][y] == "_":
@@ -52,12 +56,12 @@ def minimax(board, player, bot, turn):
                     new_board[x][y] = bot
                 else:
                     new_board[x][y] = player
-                print((x,y))
+                # print((x,y))
                 possible_moves.append((x, y))
                 # prettyBoard(new_board)
-                score, _ = minimax(new_board, player, bot, turn + 1)
+                score, _ = minimax(new_board, player, bot, turn + 1, possible_moves)
                 new_board[x][y] = "_"
-                print(f"Evaluating move ({x}, {y}) for {'bot' if turn % 2 == 1 else 'player'}: score = {score}")
+                # print(f"Evaluating move ({x}, {y}) for {'bot' if turn % 2 == 1 else 'player'}: score = {score}")
                 
                 if turn % 2 == 1:
                     if score >= best_points:
@@ -71,7 +75,6 @@ def minimax(board, player, bot, turn):
                 # print(best_points)
         if turn <= 2:
             best_points = 0
-            
             best_move = random.choice(possible_moves)
             return best_points, best_move
     # print(f"Best move for {'bot' if turn % 2 == 1 else 'player'}: {best_move} with score = {best_points}")
@@ -120,7 +123,7 @@ def tictactoe(board, player, bot):
             print("New Board:")
             prettyBoard(board)
         elif turn % 2 == 1:
-            score, rowcol = minimax(board, player, bot, turn)
+            score, rowcol = minimax(board, player, bot, turn, possible_moves)
             board[rowcol[0]][rowcol[1]] = bot
             turn += 1
             print(f"Bot chose place {rowcol[0]}, {rowcol[1]} with score of {score}.")
