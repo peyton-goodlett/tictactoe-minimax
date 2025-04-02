@@ -41,7 +41,7 @@ def minimax(board, player, bot, turn, possible_moves):
     elif win(board, player, bot) == bot:
         return 15 - turn, None
     elif win(board, player, bot) == "tie":
-        return 10 + round(turn/2), None
+        return 10, None
     best_points = float('-inf') if turn % 2 == 1 else float('inf')
     best_move = None
     # the bot always chooses the same for each spot the player does
@@ -49,6 +49,7 @@ def minimax(board, player, bot, turn, possible_moves):
     # fix it sometime ok future peyton? it make bot worse
 
     # thx past peyton its fixed
+    
     for x in range(3):
         for y in range(3):
             if new_board[x][y] == "_":
